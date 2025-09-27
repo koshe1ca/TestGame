@@ -59,4 +59,4 @@ curl -s -X POST http://localhost:8080/api/move \
 ```bash
 mvn -q -pl squares-service -am spring-boot:run
 ```
-
+Базовый URL: http://localhost:8080
