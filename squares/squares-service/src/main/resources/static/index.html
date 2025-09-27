@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <title>Игра «Квадраты»</title>
+    <style>
+        :root { --cell: 40px; --gap: 4px; }
+        body {
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+            background: #f6f7fb;
+            margin: 0; padding: 24px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        h1 { margin: 0 0 12px; font-size: 24px; }
+        #panel {
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;
+            background: #fff; border: 1px solid #e4e6ef; border-radius: 10px;
+            padding: 10px 12px; box-shadow: 0 1px 2px rgba(0,0,0,.04);
+            margin-bottom: 16px;
+        }
+        label { font-size: 14px; margin-right: 4px; }
+        select, button {
+            height: 32px; padding: 0 10px; border-radius: 6px; border: 1px solid #d9dbe8;
+            background: #fff; font-size: 14px; cursor: pointer;
+        }
+        button { background: #2b7cff; color: #fff; border-color: #2b7cff; }
+        button:disabled { opacity: .6; cursor: default; }
+        #status { margin: 8px 0 16px; font-weight: 600; color: #333; min-height: 22px; }
+        #board {
+            display: grid; gap: var(--gap); background: #2a2d34; padding: var(--gap);
+            border-radius: 12px; box-shadow: 0 6px 18px rgba(18, 24, 40, 0.1);
+            user-select: none;
+        }
+        .cell {
+            width: var(--cell); height: var(--cell); border-radius: 8px;
+            display: grid; place-items: center; cursor: pointer; transition: transform .06s;
+            background: #eef1f7; border: 1px solid #dfe3ef;
+            font-weight: 700; font-size: 14px;
+        }
+        .cell:hover { transform: translateY(-1px); }
+        .cell.W { background: #fff; color: #222; border: 2px solid #3b3f49; }
+        .cell.B { background: #20242b; color: #fff; border: 1px solid #101318; }
+        .cell.win { outline: 3px solid #ff5252; outline-offset: -2px; }
+    </style>
+</head>
+<body>
+<h1>Игра «Квадраты»</h1>
+
+<div id="panel">
+    <label for="size">Размер:</label>
+    <select id="size">
+        <option value="4">4×4</option>
+        <option value="6">6×6</option>
+        <option value="8" selected>8×8</option>
+        <option value="10">10×10</option>
+    </select>
+
+    <label for="mode">Режим:</label>
+    <select id="mode">
+        <option value="pvc" selected>Игрок vs Компьютер</option>
+        <option value="pvp">Игрок vs Игрок</option>
+        <option value="cvc">Компьютер vs Компьютер</option>
+    </select>
+
+    <label for="first">Первый ход:</label>
+    <select id="first">
+        <option value="W" selected>Белые (W)</option>
+        <option value="B">Чёрные (B)</option>
+    </select>
+
+    <button id="btnNew">Новая игра</button>
+</div>
+
+<div id="status"></div>
+<div id="board"></div>
+
+<script>
+    let state, mode, winner, busy;
+
+    document.getElementById('btnNew').onclick = startGame;
+
+    function startGame() {
+        const n = parseInt(document.getElementById('size').value);
+        mode = document.getElementById('mode').value;
+        const first = document.getElementById('first').value;
+
+        state = { n, turn: first, white: [], black: [] };
+        winner = null; busy = false;
+
+        render();
+        updateStatus(`Новая игра. Первым ходят ${first === "W" ? "белые" : "чёрные"}.`);
+
+        if (mode === 'cvc') autoPlay();
+        else if (mode === 'pvc' && first === "B") aiMove();
+    }
+
+    function render() {
+        const board = document.getElementById('board');
+        board.style.gridTemplateColumns = `repeat(${state.n}, var(--cell))`;
+        board.innerHTML = '';
+        const occupied = new Map();
+        for (const p of state.white) occupied.set(`${p.x},${p.y}`, 'W');
+        for (const p of state.black) occupied.set(`${p.x},${p.y}`, 'B');
+
+        for (let y=0; y<state.n; y++) {
+            for (let x=0; x<state.n; x++) {
+                const div = document.createElement('div');
+                div.className = 'cell';
+                div.dataset.x = x; div.dataset.y = y;
+
+                if (occupied.has(`${x},${y}`)) {
+                    const c = occupied.get(`${x},${y}`);
+                    div.classList.add(c);
+                    div.textContent = c;
+                }
+                div.onclick = () => onCellClick(x,y);
+                board.appendChild(div);
+            }
+        }
+    }
+
+    function updateStatus(msg) {
+        document.getElementById('status').textContent = msg;
+    }
+
+    async function onCellClick(x,y) {
+        if (winner || busy) return;
+        if (isTaken(x,y)) return;
+
+        if (mode === 'pvc') {
+            if (state.turn === 'W') {
+                state.white.push({x,y});
+                state.turn = 'B';
+                render();
+                await checkState();
+                if (!winner) await aiMove();
+            }
+        } else if (mode === 'pvp') {
+            const arr = state.turn === 'W' ? state.white : state.black;
+            arr.push({x,y});
+            state.turn = state.turn === 'W' ? 'B' : 'W';
+            render();
+            await checkState();
+        }
+    }
+
+    function isTaken(x,y) {
+        return state.white.some(p=>p.x===x&&p.y===y) || state.black.some(p=>p.x===x&&p.y===y);
+    }
+
+    async function checkState() {
+        const r = await fetch('/api/state', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(state)
+        }).then(r=>r.json());
+
+        if (r.winner) {
+            winner = r.winner;
+            updateStatus(`Игра окончена. Победитель: ${winner}`);
+            if (r.winningSquare) {
+                for (const pt of r.winningSquare) {
+                    const el = document.querySelector(`.cell[data-x='${pt.x}'][data-y='${pt.y}']`);
+                    if (el) el.classList.add('win');
+                }
+            }
+        } else if (r.status === 'DRAW') {
+            winner = 'DRAW';
+            updateStatus("Игра окончена. Ничья.");
+        } else {
+            updateStatus(`Ход: ${state.turn==="W"?"белые":"чёрные"}`);
+        }
+    }
+
+    async function aiMove() {
+        busy = true;
+        const r = await fetch('/api/move', {
+            method:'POST', headers:{'Content-Type':'application/json'},
+            body: JSON.stringify(state)
+        }).then(r=>r.json());
+        if (r.move && r.color) {
+            if (r.color === 'W') state.white.push(r.move);
+            else state.black.push(r.move);
+            state.turn = state.turn === 'W' ? 'B' : 'W';
+            render();
+            await checkState();
+        }
+        busy = false;
+    }
+
+    async function autoPlay() {
+        while (!winner) {
+            await aiMove();
+            await new Promise(r => setTimeout(r, 400));
+        }
+    }
+
+    startGame();
+</script>
+</body>
+</html>

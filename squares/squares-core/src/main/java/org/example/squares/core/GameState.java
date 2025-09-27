@@ -11,7 +11,7 @@ public class GameState {
     public List<Point> winningSquare = null;
 
     public GameState(int n, Color turn) {
-        if (n < 2) throw new IllegalArgumentException("N должно быть >= 2");
+        if (n < 2) throw new IllegalArgumentException("Размер поля N должен быть >= 2.");
         this.n = n;
         this.turn = turn;
     }
