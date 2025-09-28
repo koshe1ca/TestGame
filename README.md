@@ -24,12 +24,14 @@ mvn clean install
 ---
 
 ## Задание 1 — Консольное приложение
-
+Сборка
 ``` bash
 mvn -q -pl squares-cli -am package
-java -jar squares/squares-cli/target/squares-cli-1.0.0-jar-with-dependencies.jar
 ```
-
+Запуск
+``` bash
+java -jar .\squares-cli\target\squares-cli-1.0.0-jar-with-dependencies.jar
+```
 ## Команды для первого задания
 ```bash
 HELP
@@ -47,28 +49,41 @@ EXIT
 ---
 
 ## Задание 2 — REST-сервис
-Сборка и запуск 
+Сборка
 ``` bash
 mvn -q -pl squares-service -am clean package
+```
+Запуск
+``` bash
 java -jar .\squares-service\target\squares-service-1.0.0.jar
 ```
-Пример запроса статуса:
+Пример запроса статуса для Linux/macOS:
 ```bash
 curl.exe -X POST http://localhost:8080/api/state `
   -H "Content-Type: application/json" `
   -d "{\"n\":8,\"turn\":\"W\",\"white\":[],\"black\":[]}"
 ```
-Пример запроса хода компьютера:
+Пример запроса хода компьютера для Linux/macOS:
 ```bash
 curl.exe -X POST http://localhost:8080/api/move `
   -H "Content-Type: application/json" `
   -d "{\"n\":8,\"turn\":\"W\",\"white\":[],\"black\":[]}"
 ```
-
+Пример запроса статуса (Windows PowerShell):
+```Powerhell
+Invoke-RestMethod -Method Post -Uri 'http://localhost:8080/api/state' -ContentType 'application/json' -Body '{"n":8,"turn":"W","white":[],"black":[]}'
+```
+Пример запроса хода компьютера (Windows PowerShell):
+```Powerhell
+Invoke-RestMethod -Method Post -Uri 'http://localhost:8080/api/move' -ContentType 'application/json' -Body '{"n":8,"turn":"W","white":[],"black":[]}'
+```
 ## Задание 3 — Веб-приложение
-Сборка и запуск
-```bash
+Сборка
+``` bash
 mvn -q -pl squares-service -am clean package
+```
+Запуск
+``` bash
 java -jar .\squares-service\target\squares-service-1.0.0.jar
 ```
 Базовый URL: http://localhost:8080
