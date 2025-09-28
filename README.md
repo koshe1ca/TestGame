@@ -28,7 +28,11 @@ mvn clean install
 ``` bash
 mvn -q -pl squares-cli -am package
 ```
-Запуск
+Запуск для Linux/macOS
+```bash
+java -jar ./squares-cli/target/squares-cli-1.0.0-jar-with-dependencies.jar
+```
+Запуск для Windows
 ``` bash
 java -jar .\squares-cli\target\squares-cli-1.0.0-jar-with-dependencies.jar
 ```
@@ -53,7 +57,11 @@ EXIT
 ``` bash
 mvn -q -pl squares-service -am clean package
 ```
-Запуск
+Запуск для Linux/macOS
+```bash
+java -jar ./squares-service/target/squares-service-1.0.0.jar
+```
+Запуск для Windows
 ``` bash
 java -jar .\squares-service\target\squares-service-1.0.0.jar
 ```
@@ -82,7 +90,11 @@ Invoke-RestMethod -Method Post -Uri 'http://localhost:8080/api/move' -ContentTyp
 ``` bash
 mvn -q -pl squares-service -am clean package
 ```
-Запуск
+Запуск для Linux/macOS
+```bash
+java -jar ./squares-service/target/squares-service-1.0.0.jar
+```
+Запуск Windows
 ``` bash
 java -jar .\squares-service\target\squares-service-1.0.0.jar
 ```
