@@ -67,15 +67,15 @@ java -jar .\squares-service\target\squares-service-1.0.0.jar
 ```
 Пример запроса статуса для Linux/macOS:
 ```bash
-curl.exe -X POST http://localhost:8080/api/state `
-  -H "Content-Type: application/json" `
-  -d "{\"n\":8,\"turn\":\"W\",\"white\":[],\"black\":[]}"
+curl -s -X POST http://localhost:8080/api/state \
+  -H 'Content-Type: application/json' \
+  -d '{"n":8,"turn":"W","white":[],"black":[]}'
 ```
 Пример запроса хода компьютера для Linux/macOS:
 ```bash
-curl.exe -X POST http://localhost:8080/api/move `
-  -H "Content-Type: application/json" `
-  -d "{\"n\":8,\"turn\":\"W\",\"white\":[],\"black\":[]}"
+curl -s -X POST http://localhost:8080/api/move \
+  -H 'Content-Type: application/json' \
+  -d '{"n":8,"turn":"W","white":[],"black":[]}'
 ```
 Пример запроса статуса (Windows PowerShell):
 ```Powerhell
