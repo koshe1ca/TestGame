@@ -9,13 +9,17 @@
 
 - Java **17+**
 - Maven **3.8+**
-
 ---
 
-## Старт
+Все команды выполняются из папки squares
+```bash
+cd squares
+```
 
-``` bash
- mvn clean install
+## Сборка проекта
+
+```bash
+mvn clean install
 ```
 ---
 
@@ -33,30 +37,38 @@ GAME N, TYPE1 C1, TYPE2 C2
 MOVE X, Y
 EXIT
 ```
+Пример с человеком против компьютера:
+```bash
+HELP
+GAME 8, user W, comp B
+MOVE 3, 4
+EXIT
+```
 ---
 
 ## Задание 2 — REST-сервис
-
+Сборка и запуск 
 ``` bash
-mvn -q -pl squares-service -am spring-boot:run
+mvn -q -pl squares-service -am clean package
+java -jar .\squares-service\target\squares-service-1.0.0.jar
 ```
-Базовый URL: http://localhost:8080
+Пример запроса статуса:
+```bash
+curl.exe -X POST http://localhost:8080/api/state `
+  -H "Content-Type: application/json" `
+  -d "{\"n\":8,\"turn\":\"W\",\"white\":[],\"black\":[]}"
+```
+Пример запроса хода компьютера:
+```bash
+curl.exe -X POST http://localhost:8080/api/move `
+  -H "Content-Type: application/json" `
+  -d "{\"n\":8,\"turn\":\"W\",\"white\":[],\"black\":[]}"
+```
 
-## Пример запроса статуса:
+## Задание 3 — Веб-приложение
+Сборка и запуск
 ```bash
-curl -s -X POST http://localhost:8080/api/state \
-  -H 'Content-Type: application/json' \
-  -d '{"n":8,"turn":"W","white":[],"black":[]}'
-```
-## Пример запроса хода компьютера:
-```bash
-curl -s -X POST http://localhost:8080/api/move \
-  -H 'Content-Type: application/json' \
-  -d '{"n":8,"turn":"W","white":[],"black":[]}'
-```
-
-## 3 — Веб-приложение
-```bash
-mvn -q -pl squares-service -am spring-boot:run
+mvn -q -pl squares-service -am clean package
+java -jar .\squares-service\target\squares-service-1.0.0.jar
 ```
 Базовый URL: http://localhost:8080
