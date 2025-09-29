@@ -7,15 +7,6 @@ import java.io.InputStreamReader;
 import java.util.Locale;
 import java.util.Optional;
 
-/**
- * Консольная игра "Квадраты".
- *
- * Команды:
- *   GAME N, TYPE1 C1, TYPE2 C2   (TYPE = user|comp, C = W|B, белые ходят первыми)
- *   MOVE X, Y
- *   HELP
- *   EXIT
- */
 public class Main {
 
     enum Type { user, comp }
@@ -40,7 +31,7 @@ public class Main {
 
             try {
                 if (up.startsWith("GAME")) {
-                    handleGame(line); // передаём ОРИГИНАЛЬНУЮ строку
+                    handleGame(line);
                 } else if (up.startsWith("MOVE")) {
                     handleMove(line);
                 } else if (up.equals("HELP")) {
@@ -62,13 +53,10 @@ public class Main {
         }
     }
 
-    /** GAME N, TYPE1 C1, TYPE2 C2 */
     static void handleGame(String cmd) {
-        // Выделяем хвост после "GAME"
         String tail = cmd.substring(4).trim();
         if (tail.isEmpty()) throw new IllegalArgumentException("Некорректные параметры команды GAME.");
 
-        // Разделяем по запятым, допускаем лишние пробелы
         String[] parts = tail.split(",");
         if (parts.length != 3) throw new IllegalArgumentException("Некорректные параметры команды GAME.");
 
@@ -89,16 +77,13 @@ public class Main {
         p1 = new Player(t1, c1);
         p2 = new Player(t2, c2);
 
-        // Белые ходят первыми
         game = new GameState(n, Color.W);
 
         System.out.println("Новая игра начата");
 
-        // Если первый ход за компьютером — сразу сделать его (и далее, пока comp)
         stepComputerIfNeeded();
     }
 
-    /** MOVE X, Y — ход текущего игрока (если он user) */
     static void handleMove(String cmd) {
         if (game == null) { System.out.println("Нет активной игры. Используйте GAME для старта."); return; }
 
@@ -115,7 +100,6 @@ public class Main {
         Rules.applyMove(game, new Point(x, y), game.turn);
         if (printIfFinished()) return;
 
-        // Если теперь ход компьютера — дать ему походить (пока comp и игра не закончена)
         stepComputerIfNeeded();
     }
 
@@ -123,7 +107,6 @@ public class Main {
 
     static void stepComputerIfNeeded() {
         while (game != null && game.status == GameStatus.ONGOING && who(game.turn).type == Type.comp) {
-            // Если у тебя в core ещё нет AI.java — временно закомментируй блок ниже или добавь AI по нашему плану.
             AI ai = new AI(AI_SEED);
             Optional<AI.Move> mv = ai.chooseMove(game, game.turn);
             if (mv.isEmpty()) break;

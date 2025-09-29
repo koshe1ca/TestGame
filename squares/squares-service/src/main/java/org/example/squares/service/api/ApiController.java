@@ -61,7 +61,6 @@ public class ApiController {
         try {
             GameState s = ApiMapper.fromDto(dto);
 
-            // если игра уже завершена — вернём полный статус (winner/квадрат)
             if (s.status != GameStatus.ONGOING) {
                 r.status = s.status.name();
                 if (s.status == GameStatus.WIN_W) r.winner = "W";

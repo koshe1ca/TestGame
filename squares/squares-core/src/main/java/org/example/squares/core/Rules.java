@@ -33,19 +33,16 @@ public final class Rules {
         for (Point b : mine) {
             if (b.equals(p)) continue;
 
-            // 1) вертикальный отрезок (x равны) -> сдвиг по X на |dy|
             if (b.x == p.x && b.y != p.y) {
                 int dy = b.y - p.y;
                 int L = Math.abs(dy);
 
-                // вправо
                 Point d1 = new Point(p.x + L, p.y);
                 Point c1 = new Point(b.x + L, b.y);
                 if (mine.contains(d1) && mine.contains(c1)) {
                     s.winningSquare = Arrays.asList(p, b, c1, d1);
                     return true;
                 }
-                // влево
                 Point d2 = new Point(p.x - L, p.y);
                 Point c2 = new Point(b.x - L, b.y);
                 if (mine.contains(d2) && mine.contains(c2)) {
@@ -54,19 +51,16 @@ public final class Rules {
                 }
             }
 
-            // 2) горизонтальный отрезок (y равны) -> сдвиг по Y на |dx|
             if (b.y == p.y && b.x != p.x) {
                 int dx = b.x - p.x;
                 int L = Math.abs(dx);
 
-                // вниз
                 Point d1 = new Point(p.x, p.y + L);
                 Point c1 = new Point(b.x, b.y + L);
                 if (mine.contains(d1) && mine.contains(c1)) {
                     s.winningSquare = Arrays.asList(p, b, c1, d1);
                     return true;
                 }
-                // вверх
                 Point d2 = new Point(p.x, p.y - L);
                 Point c2 = new Point(b.x, b.y - L);
                 if (mine.contains(d2) && mine.contains(c2)) {

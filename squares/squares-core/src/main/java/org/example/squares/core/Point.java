@@ -10,7 +10,7 @@ public final class Point {
 
     public Point add(Point o) { return new Point(x + o.x, y + o.y); }
     public Point sub(Point o) { return new Point(x - o.x, y - o.y); }
-    public Point perp() { return new Point(-y, x); } // v⊥ для v=(x,y)
+    public Point perp() { return new Point(-y, x); }
 
     @Override public boolean equals(Object o) {
         if (this == o) return true;
